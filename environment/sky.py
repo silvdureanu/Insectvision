@@ -1,6 +1,6 @@
-from base import Environment
+from .base import Environment
 from sphere.transform import tilt
-from utils import eps
+from .utils import eps
 
 import numpy as np
 
@@ -109,7 +109,7 @@ class Sky(Environment):
                 # print "yeah!"
                 eta = np.array(noise, dtype=bool)
                 if self.verbose:
-                    print "Noise level: %.4f (%.2f %%)" % (noise, 100. * eta.sum() / float(eta.size))
+                    print ("Noise level: %.4f (%.2f %%)" % (noise, 100. * eta.sum() / float(eta.size)))
             else:
                 eta = np.zeros_like(theta, dtype=bool)
                 eta[:noise.size] = noise
@@ -394,7 +394,7 @@ class Sky(Environment):
             try:
                 sp = yaml.load(f)
             except yaml.YAMLError as exc:
-                print "Could not load the sky types.", exc
+                print ("Could not load the sky types.", exc)
                 return None
 
         rep = sp['type'][sky_type-1]
@@ -409,7 +409,7 @@ class Sky(Environment):
         # s.__tau_L = 2.
 
         for description in rep['description']:
-            print description
+            print (description)
 
         return s
 
@@ -444,7 +444,7 @@ def visualise_degree_of_polarisation(sky):
     ax.set_theta_direction(-1)
 
     theta_s, phi_s = tilt(sky.theta_t, sky.phi_t, theta=sky.theta_s, phi=sky.phi_s)
-    print theta_s, phi_s
+    print (theta_s, phi_s)
     ax.scatter(sky.phi, sky.theta, s=10, c=sky.DOP, marker='.', cmap='Greys', vmin=0, vmax=1)
     ax.scatter(phi_s, theta_s, s=100, edgecolor='black', facecolor='yellow')
     # ax.scatter(sky.phi_t + np.pi, sky.theta_t, s=200, edgecolor='black', facecolor='greenyellow')
@@ -466,7 +466,7 @@ def visualise_angle_of_polarisation(sky):
     ax.set_theta_direction(-1)
 
     theta_s, phi_s = tilt(sky.theta_t, sky.phi_t, theta=sky.theta_s, phi=sky.phi_s)
-    print theta_s, phi_s
+    print (theta_s, phi_s)
     ax.scatter(sky.phi, sky.theta, s=10, c=sky.AOP, marker='.', cmap='hsv', vmin=-np.pi, vmax=np.pi)
     ax.scatter(phi_s, theta_s, s=100, edgecolor='black', facecolor='yellow')
     # ax.scatter(sky.phi_t + np.pi, sky.theta_t, s=200, edgecolor='black', facecolor='greenyellow')

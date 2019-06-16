@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
     W = gaussian_weight(65, even=False)
     vpt = np.linalg.inv(A.T.dot(W ** 2).dot(A)).dot(A.T).dot(W ** 2)
-    print vpt.shape
+    print (vpt.shape)
     plt.subplot(247)
     plt.imshow(vpt[1].reshape((65, 65)), vmin=-1, vmax=1)
     plt.title("Vptx")
@@ -149,6 +149,6 @@ if __name__ == "__main__":
     plt.imshow(vpt[0].reshape((65, 65)), vmin=-1, vmax=1)
     plt.title("Vpty")
     vpt = np.linalg.inv(A.T.dot(W ** 2).dot(A)).dot(A.T).dot(W ** 2).dot(B)
-    print vpt
+    print (vpt)
 
     plt.show()

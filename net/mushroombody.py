@@ -108,14 +108,14 @@ if __name__ == "__main__":
     mb = MushroomBody()
     # print np.ones_like(mb.mbon).dot(mb.w_mbon2loc)
 
-    print "KCs", mb.nb_kc
-    print mb.kc
+    print ("KCs", mb.nb_kc)
+    print (mb.kc)
 
-    print "MBONs", mb.nb_mbon
-    print mb.mbon
+    print ("MBONs", mb.nb_mbon)
+    print (mb.mbon)
 
-    print "DANs", mb.nb_dan
-    print mb.dan
+    print ("DANs", mb.nb_dan)
+    print (mb.dan)
 
     inp = pd.concat([mb.w_mbon2loc, mb.w_dan2loc], axis=0).dot(mb.w_kc2loc.T)
     out = mb.w_kc2loc.dot(pd.concat([mb.w_loc2mbon, mb.w_loc2dan], axis=1))

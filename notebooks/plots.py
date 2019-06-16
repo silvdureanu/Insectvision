@@ -155,7 +155,7 @@ def plot_ephemeris(obs, dt=10):
 
     azi, azi_diff, ele = [], [], []
 
-    for month in xrange(12):
+    for month in range(12):
         obs.date = datetime(year=2018, month=month + 1, day=13)
 
         cur = obs.next_rising(sun).datetime() + delta
@@ -196,8 +196,8 @@ def plot_ephemeris(obs, dt=10):
 
     y = x.dot(w)
     error = np.absolute(y - azi_diff)
-    print "Error: %.4f +/- %.4f" % (error.mean(), error.std() / np.sqrt(len(error))),
-    print "| N = %d" % len(error)
+    print ("Error: %.4f +/- %.4f" % (error.mean(), error.std() / np.sqrt(len(error)))),
+    print ("| N = %d" % len(error))
 
     plt.figure(figsize=(10, 10))
 

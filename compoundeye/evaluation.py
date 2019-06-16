@@ -409,7 +409,7 @@ def evaluate(n=60, omega=56,
                 eta = np.argsort(np.absolute(np.random.randn(*P.shape)))[:int(noise * P.shape[0])]
                 # eta = np.array(np.absolute(np.random.randn(*P.shape)) < noise, dtype=bool)
                 if verbose:
-                    print "Noise level: %.4f (%.2f %%)" % (noise, 100. * eta.sum() / float(eta.size))
+                    print ("Noise level: %.4f (%.2f %%)" % (noise, 100. * eta.sum() / float(eta.size)))
             else:
                 eta = np.zeros_like(theta, dtype=bool)
             P[eta] = 0.  # destroy the polarisation pattern
@@ -531,7 +531,7 @@ def evaluate(n=60, omega=56,
                     ax.text(pp + np.pi/18, y, "%d" % (ii + 1), ha="center", va="center", size=10,
                             bbox=dict(boxstyle="circle", fc="w", ec="k"))
                     pref = a if ephemeris else 0.
-                    print "Sun:", np.rad2deg(pref)
+                    print ("Sun:", np.rad2deg(pref))
                     dx, dy = np.deg2rad(4) * np.sin(0.), np.deg2rad(4) * np.cos(0.)
                     ax.arrow(pp - dx, y - dy/2 - np.deg2rad(2.5), dx, dy, fc='k', ec='k',
                              head_width=.07, head_length=.1, overhang=.3)
@@ -707,7 +707,7 @@ def evaluate_old(n=60, omega=56,
             if noise > 0:
                 eta = np.absolute(np.random.randn(*P.shape)) < noise
                 if verbose:
-                    print "Noise level: %.4f (%.2f %%)" % (noise, 100. * eta.sum() / float(eta.size))
+                    print ("Noise level: %.4f (%.2f %%)" % (noise, 100. * eta.sum() / float(eta.size)))
                 P[eta] = 0.  # destroy the polarisation pattern
             else:
                 eta = np.zeros(1)

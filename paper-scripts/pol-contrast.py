@@ -31,17 +31,17 @@ if __name__ == "__main__":
             d_effs[-1].append(d_eff)
             eles[-1].append(tau.flatten())
 
-            print "Mean cost: %.2f" % d_err.mean(),
-            print "| Noise level: %.4f (%.2f %%)" % (noise, cloud)
+            print ("Mean cost: %.2f" % d_err.mean()),
+            print ("| Noise level: %.4f (%.2f %%)" % (noise, cloud))
 
     costs = np.array(costs)[:, 0, :, 0]
     d_effs = np.array(d_effs)[:, 0, :, 0]
     eles = np.rad2deg(np.array(eles)[:, 0, :])
     x = np.array([np.array(x).T] * costs.shape[-1])[:, 0, :].T
-    print x.shape
-    print costs.shape
-    print d_effs.shape
-    print eles.shape
+    print (x.shape)
+    print (costs.shape)
+    print (d_effs.shape)
+    print (eles.shape)
     # np.savez_compressed("%s-layer.npz" % activation, x=x, y=costs)
 
     max_ele = 90
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     sky1 = np.all([x >= 5, x <= 50, eles < max_ele], axis=0)
     sky2 = np.all([x > 50, x <= 80, eles < max_ele], axis=0)
     sky3 = np.all([x > 80, eles < max_ele], axis=0)
-    print "Sky: 0 - %d, 1 - %d, 2 - %d, 3 - %d" % (sky0.sum(), sky1.sum(), sky2.sum(), sky3.sum())
+    print ("Sky: 0 - %d, 1 - %d, 2 - %d, 3 - %d" % (sky0.sum(), sky1.sum(), sky2.sum(), sky3.sum()))
 
     plt.figure("cost-function-clouds", figsize=(20, 15))
     plt.subplot(223)

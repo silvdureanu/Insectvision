@@ -65,7 +65,7 @@ def skyfeatures(noise=0., simple_pol=False, samples=1000, verbose=False):
     # create cloud disturbance
     if type(noise) is np.ndarray:
         if noise.size == P.size:
-            # print "yeah!"
+            # print ("yeah!")
             eta = np.array(noise, dtype=bool)
         else:
             eta = np.zeros_like(theta, dtype=bool)
@@ -74,7 +74,7 @@ def skyfeatures(noise=0., simple_pol=False, samples=1000, verbose=False):
         eta = np.argsort(np.absolute(np.random.randn(*P.shape)))[:int(noise * P.shape[0])]
         # eta = np.array(np.absolute(np.random.randn(*P.shape)) < noise, dtype=bool)
         if verbose:
-            print "Noise level: %.4f (%.2f %%)" % (noise, 100. * eta.sum() / float(eta.size))
+            print ("Noise level: %.4f (%.2f %%)" % (noise, 100. * eta.sum() / float(eta.size)))
     else:
         eta = np.zeros_like(theta, dtype=bool)
     P[eta] = 0.  # destroy the polarisation pattern
@@ -98,8 +98,8 @@ if __name__ == "__main__":
     # dra = POLCompassDRA()
     # r = dra(sky, noise=noise)
     #
-    # print r.shape
-    # print r
+    # print (r.shape)
+    # print (r)
     #
     # plt.figure("pol-%02d" % (10 * noise), figsize=(3, 3))
     # ax = plt.subplot(111, polar=True)
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     # plt.yticks([])
     # plt.xticks([])
 
-    print y[y > 0].min()
+    print (y[y > 0].min())
 
     plt.figure("sky-lum-%02d" % (10 * noise), figsize=(3, 3))
     ax = plt.subplot(111, polar=True)
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     plt.xticks([])
     plt.savefig('sky-lum-%02d.svg' % (10 * noise))
 
-    print p.max()
+    print (p.max())
 
     plt.figure("sky-dop-%02d" % (10 * noise), figsize=(3, 3))
     ax = plt.subplot(111, polar=True)

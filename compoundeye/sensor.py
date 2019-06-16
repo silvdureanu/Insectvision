@@ -1,4 +1,4 @@
-from model import DRA, spectrum
+from .model import DRA, spectrum
 
 import numpy as np
 

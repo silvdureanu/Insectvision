@@ -1,5 +1,5 @@
 import numpy as np
-from transform import sph2vec, vec2sph
+from .transform import sph2vec, vec2sph
 
 
 def angle_between(ang1, ang2, sign=True):
@@ -42,4 +42,3 @@ def azidist(v1, v2, zenith=True):
         v2 = vec2sph(v2, zenith=zenith)
     d = (v1[1] - v2[1] + np.pi) % (2 * np.pi) - np.pi
     return np.absolute(d)
-

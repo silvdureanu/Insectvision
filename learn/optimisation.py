@@ -40,7 +40,7 @@ def optimise(func, algo_name="sga", population=100, verbosity=100,
     else:
         pop = pg.population(prob, population)
 
-    print a.get_name()
+    print (a.get_name())
 
     log = np.empty((0, len(get_log(algo_name))))
     log_x = np.empty((0, func.ndim))
@@ -53,7 +53,7 @@ def optimise(func, algo_name="sga", population=100, verbosity=100,
         new_log = np.array(a.extract(algorithm.__class__).get_log())
         new_log[:, labels.index("gen")] += it * verbosity
         if save_log_x and verbosity is not None and verbosity > 0:
-            print row_format.format(*["%.4f" % e for e in new_log[0]])
+            print (row_format.format(*["%.4f" % e for e in new_log[0]]))
         log = np.vstack([log, new_log])
         log_x = np.vstack([log_x, pop.champion_x])
 

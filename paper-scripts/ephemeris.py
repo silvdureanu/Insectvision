@@ -55,8 +55,8 @@ if __name__ == "__main__":
         plt.figure("tau2ele", figsize=(5, 5))
         i_min = np.argmin(res)
         i_max = np.argmax(res)
-        print "Elevation -- Min: %.2f, Max: %.2f" % (ele[i_min], ele[i_max])
-        print "Response  -- Min: %.2f, Max: %.2f" % (res[i_min], res[i_max])
+        print ("Elevation -- Min: %.2f, Max: %.2f" % (ele[i_min], ele[i_max]))
+        print ("Response  -- Min: %.2f, Max: %.2f" % (res[i_min], res[i_max]))
         plt.subplot(111)
         plt.scatter(res, ele, c='black', marker='.')
         plt.scatter(res, ele_pred, c='red', marker='.')
@@ -116,12 +116,12 @@ if __name__ == "__main__":
 
         # w = np.linalg.pinv(x).dot(azi_diff)
         w = np.array([1., 0.])
-        print w
+        print (w)
 
         y = x.dot(w)
         error = np.absolute(y - azi_diff)
-        print "Error: %.4f +/- %.4f" % (np.nanmean(error), np.nanstd(error) / np.sqrt(len(error))),
-        print "| N = %d" % len(error)
+        print ("Error: %.4f +/- %.4f" % (np.nanmean(error), np.nanstd(error) / np.sqrt(len(error)))),
+        print ("| N = %d" % len(error))
 
         plt.figure(figsize=(10, 10))
 
@@ -174,7 +174,7 @@ if __name__ == "__main__":
             if cur > end:
                 cur = obs.previous_rising(sun).datetime() + delta
 
-            print cur, end
+            print (cur, end)
             while cur <= end:
                 obs.date = cur
                 sun.compute(obs)
@@ -205,12 +205,12 @@ if __name__ == "__main__":
 
         # w = np.linalg.pinv(x).dot(azi_diff)
         w = np.array([1., 0.])
-        print w
+        print (w)
 
         y = x.dot(w)
         error = np.absolute(y - azi_diff)
-        print "Error: %.4f +/- %.4f" % (error.mean(), error.std() / np.sqrt(len(error))),
-        print "| N = %d" % len(error)
+        print ("Error: %.4f +/- %.4f" % (error.mean(), error.std() / np.sqrt(len(error)))),
+        print ("| N = %d" % len(error))
 
         plt.figure(figsize=(10, 10))
 

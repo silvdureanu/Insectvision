@@ -24,7 +24,7 @@ try:
 except IOError:
     z_terrain = np.random.randn(*x_terrain.shape) / 50
 
-print z_terrain.max(), z_terrain.min()
+print (z_terrain.max(), z_terrain.min())
 
 
 def encode(theta, phi, Y, P, A, theta_t=0., phi_t=0., nb_tb1=8, sigma=np.deg2rad(13), shift=np.deg2rad(40)):
@@ -67,7 +67,7 @@ def get_3d_direction(x, y, yaw, tau=.06):
     points = np.array([x_terrain[i], y_terrain[i], z_terrain[i]]).T
     if points.shape[0] == 0:
         return 0., 0.
-    # print points.shape,
+    # print (points.shape),
     # compute centred coordinates and run SVD
     _, _, vh = np.linalg.svd(points - points.mean(axis=0))
     # unitary normal vector
@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
             v = np.zeros(2)
             tb1 = []
-            # print np.rad2deg(phi_s)
+            # print (np.rad2deg(phi_s))
 
             # plt.figure("yaws")
             for _, _, _, yaw in oroute:
@@ -217,7 +217,7 @@ if __name__ == "__main__":
 
             ri += 1
 
-        print "Maximum tilting: %.2f deg" % np.rad2deg(max_theta)
+        print ("Maximum tilting: %.2f deg" % np.rad2deg(max_theta))
 
         d_x_mean = np.mean(d_x, axis=0)
         d_x_se = np.std(d_x, axis=0) / np.sqrt(len(d_x))
@@ -243,7 +243,7 @@ if __name__ == "__main__":
         # plt.ylabel(r"Tortuosity of homebound route")
         # plt.xlabel(r"Distance travelled / Turning point distance [%]")
 
-        print "Noise:", noise
+        print ("Noise:", noise)
     plt.show()
 
 if __name__ == "__main__":
@@ -255,15 +255,15 @@ if __name__ == "__main__":
     except IOError:
         terrain = np.zeros_like(z_terrain)
         for i in xrange(terrain.shape[0]):
-            print "%04d / %04d" % (i + 1, terrain.shape[0]),
+            print ("%04d / %04d" % (i + 1, terrain.shape[0])),
             for j in xrange(terrain.shape[1]):
                 k = np.sqrt(np.square(x_terrain[i, j] - x_terrain) + np.square(y_terrain[i, j] - y_terrain)) < tau
                 terrain[i, j] = z_terrain[k].mean()
                 if j % 20 == 0:
-                    print ".",
-            print ""
+                    print ("."),
+            print ("")
 
-        print terrain.min(), terrain.max()
+        print (terrain.min(), terrain.max())
         np.savez_compressed("terrain-%.2f.npz" % tau, terrain=terrain)
 
     plt.figure("terrain", figsize=(5, 5))

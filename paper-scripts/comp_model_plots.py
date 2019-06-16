@@ -10,7 +10,7 @@ tb1_names = ['L8/R1', 'L7/R2', 'L6/R3', 'L5/R4', 'L4/R5', 'L3/R6', 'L2/R7', 'L1/
 
 
 def nb_neurons_test(save=None, mode=0, **kwargs):
-    print "Running number of neurons test:", kwargs
+    print ("Running number of neurons test:", kwargs)
 
     plt.figure("Structure", figsize=(10, 5))
 
@@ -28,7 +28,7 @@ def nb_neurons_test(save=None, mode=0, **kwargs):
             d_err, d_eff, tau, _, _ = evaluate(nb_tb1=nb_tb1, nb_cl1=nb_cl1_default, verbose=False, **kwargs)
             means[ii] = (d_err * tau / tau.sum()).sum()
             ses[ii] = d_err.std() / np.sqrt(d_err.size)
-            print 'TB1 = %03d, CL1 = %03d | Mean cost: %.2f +/- %.4f' % (nb_tb1, nb_cl1_default, means[ii], ses[ii])
+            print ('TB1 = %03d, CL1 = %03d | Mean cost: %.2f +/- %.4f' % (nb_tb1, nb_cl1_default, means[ii], ses[ii]))
 
         means = means.reshape(nb_tb1s.shape)
 
@@ -48,7 +48,7 @@ def nb_neurons_test(save=None, mode=0, **kwargs):
             d_err, d_eff, tau, _, _ = evaluate(nb_tb1=nb_tb1_default, nb_cl1=nb_cl1, verbose=False, **kwargs)
             means[ii] = (d_err * tau / tau.sum()).sum()
             ses[ii] = d_err.std() / np.sqrt(d_err.size)
-            print 'TB1 = %03d, CL1 = %03d | Mean cost: %.2f +/- %.4f' % (nb_tb1_default, nb_cl1, means[ii], ses[ii])
+            print ('TB1 = %03d, CL1 = %03d | Mean cost: %.2f +/- %.4f' % (nb_tb1_default, nb_cl1, means[ii], ses[ii]))
 
         means = means.reshape(nb_cl1s.shape)
 
@@ -76,7 +76,7 @@ def nb_neurons_test(save=None, mode=0, **kwargs):
                 d_err, d_eff, tau, _, _ = evaluate(nb_tb1=nb_tb1, nb_cl1=nb_cl1, verbose=False, **kwargs)
                 means[ii] = (d_err * tau / tau.sum()).sum()
                 se = d_err.std() / np.sqrt(d_err.size)
-                print 'TB1 = %03d, CL1 = %03d | Mean cost: %.2f +/- %.4f' % (nb_tb1, nb_cl1, means[ii], se)
+                print ('TB1 = %03d, CL1 = %03d | Mean cost: %.2f +/- %.4f' % (nb_tb1, nb_cl1, means[ii], se))
 
             means = means.reshape(nb_cl1s.shape)
             np.savez_compressed(filename, nb_tb1=nb_tb1s, nb_cl1=nb_cl1s, costs=means)
@@ -85,9 +85,9 @@ def nb_neurons_test(save=None, mode=0, **kwargs):
         tb1_min = nb_tb1s[ii, np.arange(91)]
         cl1_min = nb_cl1s[ii, np.arange(91)]
         means_min = means[ii, np.arange(91)]
-        print 'Minimum cost (%.2f) for %d TB1, CL1 = %d neurons' % (means_min[15], tb1_min[15], cl1_min[30])
-        print 'Mean TB1 %.2f +/- %.4f' % (tb1_min.mean(), tb1_min.std() / np.sqrt(tb1_min.size))
-
+        print ('Minimum cost (%.2f) for %d TB1, CL1 = %d neurons' % (means_min[15], tb1_min[15], cl1_min[30]))
+        print ('Mean TB1 %.2f +/- %.4f' % (tb1_min.mean(), tb1_min.std() / np.sqrt(tb1_min.size))
+)
         with plt.rc_context({'ytick.color': 'white'}):
             plt.pcolormesh(np.deg2rad(nb_tb1s), nb_cl1s, means, cmap="Reds", vmin=0, vmax=90)
             plt.plot(np.deg2rad(tb1_min), cl1_min, 'g-')
@@ -106,9 +106,9 @@ def nb_neurons_test(save=None, mode=0, **kwargs):
 def noise_test(save=None, mode=0, repeats=10, **kwargs):
     from sphere.transform import sph2vec
 
-    print "Running noise test:", kwargs
+    print ("Running noise test:", kwargs)
     modes = ['normal', 'corridor', 'side']
-    print "Mode:", modes[mode]
+    print ("Mode:", modes[mode])
 
     plt.figure("noise-%s" % modes[mode], figsize=(5, 5))
     n, omega = 60, 56
@@ -140,7 +140,7 @@ def noise_test(save=None, mode=0, repeats=10, **kwargs):
             ses[ii] = (ses[ii] * i + d_err.std() / np.sqrt(d_err.size)) / (i + 1)
             taus[ii] = (taus[ii] * i + tau.mean()) / (i + 1)
 
-            print "Noise level: %.2f (%03d) | Mean cost: %.2f +/- %.4f" % (eta, np.sum(noise), means[ii], ses[ii])
+            print ("Noise level: %.2f (%03d) | Mean cost: %.2f +/- %.4f" % (eta, np.sum(noise), means[ii], ses[ii]))
 
     plt.fill_between(etas * 100, means-ses, means+ses, facecolor="grey")
     plt.plot(etas * 100, means, color="red", linestyle="-", label="tilting")
@@ -172,7 +172,7 @@ def noise_test(save=None, mode=0, repeats=10, **kwargs):
             means[ii] = (means[ii] * i + d_err.mean()) / (i + 1)
             ses[ii] = (ses[ii] * i + d_err.std() / np.sqrt(d_err.size)) / (i + 1)
             taus[ii] = (taus[ii] * i + tau.mean()) / (i + 1)
-            print "Noise level: %.2f (%03d) | Mean cost: %.2f +/- %.4f" % (eta, np.sum(noise), means[ii], ses[ii])
+            print ("Noise level: %.2f (%03d) | Mean cost: %.2f +/- %.4f" % (eta, np.sum(noise), means[ii], ses[ii]))
 
     plt.fill_between(etas * 100, means-ses, means+ses, facecolor="grey", alpha=.5)
     plt.plot(etas * 100, means, color="black", linestyle="-", label="plane")
@@ -200,7 +200,7 @@ def noise2disturbance_plot(n=60, samples=1000):
         for _ in xrange(samples):
             noise_lvl[ii] += np.sum(np.absolute(np.random.randn(n)) < eta) / z
         noise_lvl[ii] /= float(samples)
-        print "Noise: %.2f -- %2.2f" % (eta, noise_lvl[ii])
+        print ("Noise: %.2f -- %2.2f" % (eta, noise_lvl[ii]))
 
     plt.figure("noise2level", figsize=(5, 2))
     plt.plot(etas, noise_lvl, color="black")
@@ -216,7 +216,7 @@ def noise2disturbance_plot(n=60, samples=1000):
 
 
 def gate_test(save=None, mode=2, filename="gate-costs.npz", **kwargs):
-    print "Running gating test:", kwargs
+    print ("Running gating test:", kwargs)
 
     plt.figure(filename[:-4], figsize=(5, 5))
     ax = plt.subplot(111, polar=True)
@@ -234,7 +234,7 @@ def gate_test(save=None, mode=2, filename="gate-costs.npz", **kwargs):
 
             means[ii] = d_err.mean()
             ses[ii] = d_err.std() / np.sqrt(d_err.size)
-            print "Sigma: %.2f | Mean cost: %.2f +/- %.4f" % (np.rad2deg(sigma), means[ii], ses[ii])
+            print ("Sigma: %.2f | Mean cost: %.2f +/- %.4f" % (np.rad2deg(sigma), means[ii], ses[ii]))
 
         plt.fill_between(sigmas, means - ses, means + ses, facecolor="C1", alpha=.5)
         plt.plot(sigmas, means, color="C1", label="sigma")
@@ -246,7 +246,7 @@ def gate_test(save=None, mode=2, filename="gate-costs.npz", **kwargs):
 
             means[ii] = d_err.mean()
             ses[ii] = d_err.std() / np.sqrt(d_err.size)
-            print "Shift: %.2f | Mean cost: %.2f +/- %.4f" % (np.rad2deg(shift), means[ii], ses[ii])
+            print ("Shift: %.2f | Mean cost: %.2f +/- %.4f" % (np.rad2deg(shift), means[ii], ses[ii]))
 
         plt.fill_between(shifts, means - ses, means + ses, facecolor="C2", alpha=.5)
         plt.plot(shifts, means, color="C2", label="shift")
@@ -273,9 +273,9 @@ def gate_test(save=None, mode=2, filename="gate-costs.npz", **kwargs):
                                                    sigma_sol=sigma_sol, shift_sol=shift_sol, verbose=False, **kwargs)
                 means[ii] = d_err.mean()
                 se = np.rad2deg(d_err.std() / np.sqrt(d_err.size))
-                print r'S_p = % 3.2f, T_p = % 3.2f, S_s = % 3.2f, T_s = % 3.2f | Mean cost: %.2f +/- %.4f' % (
+                print (r'S_p = % 3.2f, T_p = % 3.2f, S_s = % 3.2f, T_s = % 3.2f | Mean cost: %.2f +/- %.4f' % (
                     np.rad2deg(sigma_pol), np.rad2deg(shift_pol),
-                    np.rad2deg(sigma_sol), np.rad2deg(shift_sol), means[ii], se)
+                    np.rad2deg(sigma_sol), np.rad2deg(shift_sol), means[ii], se))
 
             means = means.reshape(shifts_pol.shape)
             np.savez_compressed(filename, shifts=shifts_pol, sigmas=sigmas_pol, costs=means)
@@ -284,8 +284,8 @@ def gate_test(save=None, mode=2, filename="gate-costs.npz", **kwargs):
         sigma_min = sigmas.flatten()[ii]
         shift_min = shifts.flatten()[ii]
         means_min = means.flatten()[ii]
-        print 'Minimum cost (%.2f) for Sigma = %.2f, Shift = %.2f' % (
-            means_min, np.rad2deg(sigma_min), np.rad2deg(shift_min))
+        print ('Minimum cost (%.2f) for Sigma = %.2f, Shift = %.2f' % (
+            means_min, np.rad2deg(sigma_min), np.rad2deg(shift_min)))
 
         with plt.rc_context({'ytick.color': 'white'}):
             plt.pcolormesh(shifts, sigmas, means, cmap="Reds", vmin=0, vmax=90)
@@ -305,7 +305,7 @@ def gate_test(save=None, mode=2, filename="gate-costs.npz", **kwargs):
 
 
 def structure_test(save=None, mode=0, **kwargs):
-    print "Running structure test:", kwargs
+    print ("Running structure test:", kwargs)
 
     plt.figure("Structure", figsize=(10, 5))
 
@@ -326,7 +326,7 @@ def structure_test(save=None, mode=0, **kwargs):
             d_err, d_eff, tau, _, _ = evaluate(n=n, omega=omega_default, verbose=False, **kwargs)
             means[ii] = np.mean(d_err)
             ses[ii] = d_err.std() / np.sqrt(d_err.size)
-            print 'N = % 3d, Omega = %.2f | Mean cost: %.2f +/- %.4f' % (n, omega_default, means[ii], ses[ii])
+            print ('N = % 3d, Omega = %.2f | Mean cost: %.2f +/- %.4f' % (n, omega_default, means[ii], ses[ii]))
 
         means = means.reshape(ns.shape)
 
@@ -346,7 +346,7 @@ def structure_test(save=None, mode=0, **kwargs):
             d_err, d_eff, tau, _, _ = evaluate(n=n_default, omega=omega, verbose=False, **kwargs)
             means[ii] = np.mean(d_err)
             ses[ii] = d_err.std() / np.sqrt(d_err.size)
-            print 'N = % 3d, Omega = %.2f | Mean cost: %.2f +/- %.4f' % (n_default, omega, means[ii], ses[ii])
+            print ('N = % 3d, Omega = %.2f | Mean cost: %.2f +/- %.4f' % (n_default, omega, means[ii], ses[ii]))
 
         means = means.reshape(omegas.shape)
 
@@ -377,7 +377,7 @@ def structure_test(save=None, mode=0, **kwargs):
                 d_err, d_eff, tau, _, _ = evaluate(verbose=False, **kwargs)
                 means[ii] = np.mean(d_err)
                 se = d_err.std() / np.sqrt(d_err.size)
-                print 'N = % 3d, Omega = %.2f | Mean cost: %.2f +/- %.4f' % (n, omega, means[ii], se)
+                print ('N = % 3d, Omega = %.2f | Mean cost: %.2f +/- %.4f' % (n, omega, means[ii], se))
 
             means = means.reshape(omegas.shape)
             np.savez_compressed(filename, omegas=omegas, ns=ns, costs=means)
@@ -387,11 +387,11 @@ def structure_test(save=None, mode=0, **kwargs):
         omega_min = omegas[ii, np.arange(91)]
         n_min = ns[ii, np.arange(91)]
         means_min = means[ii, np.arange(91)]
-        print means_min
-        print n_min
-        print omega_min
-        print 'Minimum cost (%.2f) for N = %d, Omega = %.2f' % (means_min[jj], n_min[jj], omega_min[jj])
-        print 'Mean omega %.2f +/- %.4f' % (omega_min.mean(), omega_min.std() / np.sqrt(omega_min.size))
+        print (means_min)
+        print (n_min)
+        print (omega_min)
+        print ('Minimum cost (%.2f) for N = %d, Omega = %.2f' % (means_min[jj], n_min[jj], omega_min[jj]))
+        print ('Mean omega %.2f +/- %.4f' % (omega_min.mean(), omega_min.std() / np.sqrt(omega_min.size)))
 
         with plt.rc_context({'ytick.color': 'white'}):
             plt.pcolormesh(np.deg2rad(omegas), ns, means, cmap="Reds", vmin=0, vmax=90)
@@ -416,7 +416,7 @@ def tilt_test(samples=500, **kwargs):
     d_mean = np.nanmean(d_err)
     tau_mean = np.nanmean(tau)
     d_se = d_err.std() / np.sqrt(d_err.size)
-    print "Mean cost: %.2f +/- %.4f, Certainty: %.2f" % (d_mean, d_se, tau_mean)
+    print ("Mean cost: %.2f +/- %.4f, Certainty: %.2f" % (d_mean, d_se, tau_mean))
 
     if samples == 1000:
         samples /= 2
@@ -430,12 +430,12 @@ def tilt_test(samples=500, **kwargs):
     tau_30 = np.nanmean(tau[:, 1:9], axis=1)
     d_60 = np.nanmean(d_err[:, 9:], axis=1)
     tau_60 = np.nanmean(tau[:, 9:], axis=1)
-    print "Mean cost (00): %.2f +/- %.4f, Certainty: %.2f" % (
-        np.nanmean(d_00), np.nanstd(d_00) / d_00.size, np.nanmean(tau_00))
-    print "Mean cost (30): %.2f +/- %.4f, Certainty: %.2f" % (
-        np.nanmean(d_err[:, 1:9]), np.nanstd(d_err[:, 1:9]) / d_err[:, 1:9].size, np.nanmean(tau[:, 1:9]))
-    print "Mean cost (60): %.2f +/- %.4f, Certainty: %.2f" % (
-        np.nanmean(d_err[:, 9:]), np.nanstd(d_err[:, 9:]) / d_err[:, 9:].size, np.nanmean(tau[:, 9:]))
+    print ("Mean cost (00): %.2f +/- %.4f, Certainty: %.2f" % (
+        np.nanmean(d_00), np.nanstd(d_00) / d_00.size, np.nanmean(tau_00)))
+    print ("Mean cost (30): %.2f +/- %.4f, Certainty: %.2f" % (
+        np.nanmean(d_err[:, 1:9]), np.nanstd(d_err[:, 1:9]) / d_err[:, 1:9].size, np.nanmean(tau[:, 1:9])))
+    print ("Mean cost (60): %.2f +/- %.4f, Certainty: %.2f" % (
+        np.nanmean(d_err[:, 9:]), np.nanstd(d_err[:, 9:]) / d_err[:, 9:].size, np.nanmean(tau[:, 9:])))
 
     plt.figure("Tilts", figsize=(10, 3))
     for i, ang, dd in zip(range(3), [0, np.pi/6, np.pi/3], [d_00, d_30, d_60]):
@@ -655,7 +655,7 @@ def heinze_real(mode=1, n_tb1=0):
             if d_00 > d_pi:
                 phi_mean += np.pi
             phi_max[j].append(phi_mean)
-            print "Col %d - %s, mean: % 3.2f, p = %.4f" % (col, filename, np.rad2deg(phi_mean), p_value)
+            print ("Col %d - %s, mean: % 3.2f, p = %.4f" % (col, filename, np.rad2deg(phi_mean), p_value))
 
             if mode == 1:
                 plt.figure("heinze-L%d-R%d-%s" % (8 - col, col + 1, filename), figsize=(3, 3))
@@ -708,7 +708,7 @@ def heinze_real(mode=1, n_tb1=0):
 
 
 def tilt_ephem_test(**kwargs):
-    print "Running simple tilt and ephemeris test:", kwargs
+    print ("Running simple tilt and ephemeris test:", kwargs)
     kwargs['samples'] = kwargs.get('samples', 1)
     kwargs['show_plots'] = kwargs.get('show_plots', True)
     kwargs['show_structure'] = kwargs.get('show_structure', False)
@@ -721,20 +721,20 @@ def tilt_ephem_test(**kwargs):
     d_err, d_eff, t, _, _ = evaluate(**kwargs)
     d_mean = np.nanmean(d_err)
     d_se = np.nanstd(d_err) / np.sqrt(d_err.size)
-    print "Mean cost: %.2f +/- %.4f -- Certainty: %.2f" % (d_mean, d_se, np.nanmean(np.rad2deg(t)))
+    print ("Mean cost: %.2f +/- %.4f -- Certainty: %.2f" % (d_mean, d_se, np.nanmean(np.rad2deg(t))))
 
 
 def one_test(**kwargs):
-    print "Running single test:", kwargs
+    print ("Running single test:", kwargs)
 
     d_err, d_eff, t, _, _ = evaluate(**kwargs)
     d_mean = np.nanmean(d_err)
     d_se = np.nanstd(d_err) / np.sqrt(d_err.size)
-    print "Mean cost: %.2f +/- %.4f -- Certainty: %.2f" % (d_mean, d_se, np.nanmean(np.rad2deg(t)))
+    print ("Mean cost: %.2f +/- %.4f -- Certainty: %.2f" % (d_mean, d_se, np.nanmean(np.rad2deg(t))))
 
 
 def elevation_test(**kwargs):
-    print "Running elevation test:", kwargs
+    print ("Running elevation test:", kwargs)
 
     sun_ele = np.linspace(0, np.pi/2, 91)
     sun_azi = np.linspace(0, 2 * np.pi, 360, endpoint=False)
@@ -759,7 +759,7 @@ def elevation_test(**kwargs):
             d_mean[i] = np.nanmean(d_err)
             d_se[i] = np.nanstd(d_err) / np.sqrt(np.sum(~np.isnan(d_err)))
             tau[i] += np.rad2deg(np.nanmean(t))
-            print "Mean cost: %.2f +/- %.4f -- Certainty: %.2f -- ele: %.2f" % (d_mean[i], d_se[i], tau[i], np.rad2deg(theta_s))
+            print ("Mean cost: %.2f +/- %.4f -- Certainty: %.2f -- ele: %.2f" % (d_mean[i], d_se[i], tau[i], np.rad2deg(theta_s)))
         plt.fill_between(np.rad2deg(sun_ele), d_mean - d_se, d_mean + d_se, facecolor='C%d' % j, alpha=.5)
         # plt.semilogy(np.rad2deg(sun_ele), d_mean, color='C%d' % j, label=r'$\eta = %.1f$' % noise)
         plt.plot(np.rad2deg(sun_ele), d_mean, color='C%d' % j, label=r'$\eta = %.1f$' % noise)
@@ -789,7 +789,7 @@ def elevation_test(**kwargs):
     #     d_mean[j] = np.nanmean(d_err)
     #     d_se[j] = np.nanstd(d_err) / np.sqrt(np.sum(~np.isnan(d_err)))
     #     tau[j] = np.rad2deg(np.nanmean(t))
-    #     print "Mean cost: %.2f +/- %.4f -- Certainty: %.2f -- noise: %.2f" % (d_mean[j], d_se[j], tau[j], noise)
+    #     print ("Mean cost: %.2f +/- %.4f -- Certainty: %.2f -- noise: %.2f" % (d_mean[j], d_se[j], tau[j], noise))
     # plt.fill_between(noises, d_mean - d_se, d_mean + d_se, facecolor='black', alpha=.5)
     # # plt.semilogy(noises, d_mean, 'k-%s' % ('' if weighted else '-'),
     # #              label=r'%s' % ('weighted' if weighted else ' simple'))
