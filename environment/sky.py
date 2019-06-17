@@ -368,7 +368,7 @@ class Sky(Environment):
         """
         from ephem import Sun
         from datetime import datetime
-        from utils import get_seville_observer
+        from .utils import get_seville_observer
 
         sun = Sun()
         if obs is None:

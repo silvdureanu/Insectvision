@@ -1,4 +1,4 @@
-from compound import *
+from .compound import *
 from numpy.linalg import LinAlgError
 
 
@@ -19,4 +19,3 @@ def lucas_kanade(n_val, o_val, rdir, rsensor, w=None, kernel=np.pi):
         except LinAlgError:
             v[i, :] = np.zeros(2)
     return v
-

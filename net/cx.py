@@ -1,8 +1,16 @@
 import numpy as np
+import os
+import yaml
 from scipy.special import expit
-from base import Network, params, RNG, GAIN
+from base import Network, RNG
+# get path of the script
+cpath = os.path.dirname(os.path.abspath(__file__)) + '/'
 
-GAIN = -1. / GAIN
+# load parameters
+with open(cpath + 'Adin2016.yaml', 'rb') as f:
+    params = yaml.safe_load(f)
+
+GAIN = -.1 / params['gain']
 N_COLUMNS = params['central-complex']['columns']  # 8
 x = np.linspace(0, 2 * np.pi, N_COLUMNS, endpoint=False)
 

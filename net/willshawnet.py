@@ -3,6 +3,8 @@ from base import Network, RNG
 import numpy as np
 import yaml
 import os
+import sys
+sys.path.insert(0, '../../compmodels')
 
 # get path of the script
 __dir__ = os.path.dirname(os.path.abspath(__file__))
