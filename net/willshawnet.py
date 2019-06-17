@@ -4,6 +4,7 @@ import numpy as np
 import yaml
 import os
 import sys
+from PIL import Image
 sys.path.insert(0, '../../compmodels')
 
 # get path of the script
@@ -181,7 +182,7 @@ if __name__ == "__main__":
             print ("QUIT!")
             break
 
-        img, _ = world.draw_panoramic_view(x, y, z, phi)
+        img = world.draw_panoramic_view(x, y, z, phi)
         inp = np.array(img).reshape((-1, 3))
         en = nn(inp.flatten())
 
