@@ -20,12 +20,12 @@ class AntEye(CompoundEye):
             ommatidia = np.array([thetas.flatten(), phis.flatten()]).T
 
         super(AntEye, self).__init__(
-            ommatidia=ommatidia,
-            central_microvili=(0., 0.),
-            noise_factor=.1,
-            activate_dop_sensitivity=False
+            #Somehow changed at some point - replacing with default desert ant params, taken from DRA
+            n=60,
+            omega=56,
+            rho=5.4
         )
-
-        self._channel_filters.pop("uv")
-        self._channel_filters.pop("b")
-        self.activate_pol_filters(False)
+        #Again, presumably existed in old version of model.py, but alas, not anymore :/
+        #self._channel_filters.pop("uv")
+        #self._channel_filters.pop("b")
+        #self.activate_pol_filters(False)
