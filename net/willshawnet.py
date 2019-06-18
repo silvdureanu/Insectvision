@@ -1,11 +1,13 @@
-from base import Network, RNG
+import sys
+from PIL import Image
+sys.path.insert(0, '../../compmodels')
+sys.path.insert(0, '..')
+from net.base import Network, RNG
 
 import numpy as np
 import yaml
 import os
-import sys
-from PIL import Image
-sys.path.insert(0, '../../compmodels')
+
 
 # get path of the script
 __dir__ = os.path.dirname(os.path.abspath(__file__))

@@ -2,7 +2,7 @@ import numpy as np
 import os
 import yaml
 from scipy.special import expit
-from base import Network, RNG
+from net.base import Network, RNG
 # get path of the script
 cpath = os.path.dirname(os.path.abspath(__file__)) + '/'
 
