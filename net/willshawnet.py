@@ -54,7 +54,7 @@ class WillshawNet(Network):
         self.kc = np.zeros(self.nb_kc)
         self.en = np.zeros(self.nb_en)
 
-        self.__update = False
+        self.update = False
 
     def reset(self):
         super(WillshawNet, self).reset()
@@ -67,12 +67,13 @@ class WillshawNet(Network):
 
     def __call__(self, *args, **kwargs):
         self.pn, self.kc, self.en = self._fprop(args[0])
-        if self.__update:
+        if self.update:
             self._update(self.kc)
         return self.en
 
     def _fprop(self, pn):
         a_pn = self.f_pn(pn)
+        print(pn)
         kc = a_pn.dot(self.w_pn2kc)
         a_kc = self.f_kc(kc)
         en = a_kc.dot(self.w_kc2en)
@@ -98,7 +99,7 @@ class WillshawNet(Network):
         self.w_kc2en[:, 0][learning_rule] = np.maximum(self.w_kc2en[:, 0][learning_rule] - self.learning_rate, 0)
 
 
-def generate_pn2kc_weights(nb_pn, nb_kc, min_pn=5, max_pn=21, aff_pn2kc=None, nb_trials=100000, baseline=25000,
+def generate_pn2kc_weights(nb_pn, nb_kc, min_pn=8, max_pn=12, aff_pn2kc=None, nb_trials=100000, baseline=25000,
                            rnd=RNG, dtype=np.float32):
     """
     Create the synaptic weights among the Projection Neurons (PNs) and the Kenyon Cells (KCs).
