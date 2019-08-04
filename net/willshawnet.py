@@ -5,8 +5,10 @@ sys.path.insert(0, '..')
 from net.base import Network, RNG
 
 import numpy as np
+import sklearn.decomposition
 import yaml
 import os
+import random
 
 
 # get path of the script
@@ -41,20 +43,26 @@ class WillshawNet(Network):
         self.nb_kc = params['mushroom-body']['KC'] * nb_channels
         self.nb_en = params['mushroom-body']['EN']
 
-        self.w_pn2kc = generate_pn2kc_weights(self.nb_pn, self.nb_kc, dtype=self.dtype)
+        #self.w_pn2kc = generate_pn2kc_weights(self.nb_pn, self.nb_kc, dtype=self.dtype)
+        self.w_pn2kc = generate_random_pn2kc_weights(self.nb_pn, self.nb_kc, dtype = self.dtype)
         self.w_kc2en = np.ones((self.nb_kc, self.nb_en), dtype=self.dtype)
         self.params = [self.w_pn2kc, self.w_kc2en]
+        self.n_hist = np.zeros(self.nb_kc)
+        self.lambdas = np.full(self.nb_kc, 600)
+        self.density_mask = np.ones(self.nb_kc, dtype=self.dtype)
 
         self.f_pn = lambda x: np.maximum(self.dtype(x) / self.dtype(255), 0)
         # self.f_pn = lambda x: np.maximum(self.dtype(self.dtype(x) / self.dtype(255) > .5), 0)
         self.f_kc = lambda x: self.dtype(x > tau)
+        self.f_kc_dynamic = lambda x: self.dtype(x > 0)
         self.f_en = lambda x: np.maximum(x, 0)
 
         self.pn = np.zeros(self.nb_pn)
         self.kc = np.zeros(self.nb_kc)
         self.en = np.zeros(self.nb_en)
-
+        self.learn_weights = False
         self.update = False
+        self.adapt = False
 
     def reset(self):
         super(WillshawNet, self).reset()
@@ -67,18 +75,69 @@ class WillshawNet(Network):
 
     def __call__(self, *args, **kwargs):
         self.pn, self.kc, self.en = self._fprop(args[0])
+        #print(self.pn)
+        #print(self.w_pn2kc)
         if self.update:
             self._update(self.kc)
+        if self.adapt:
+            self._adapt(self.pn)
         return self.en
 
     def _fprop(self, pn):
         a_pn = self.f_pn(pn)
-        print(pn)
+        #Normalise the input
+        a_pn = 42 * a_pn / np.linalg.norm(a_pn)
         kc = a_pn.dot(self.w_pn2kc)
+        #Scale KC activations by the local density, ensuring that KCs in areas with higher densities are proportionally
+        #   harder to activate, meaning that the % of activated KCs should remain constant
+        kc = kc / self.density_mask
         a_kc = self.f_kc(kc)
+        #biased_kc = kc - (self._tau * 250*self.n_hist)
+        #a_kc = self.f_kc_dynamic(biased_kc)
+        print(np.count_nonzero(a_kc)/self.nb_kc)
         en = a_kc.dot(self.w_kc2en)
         a_en = self.f_en(en)
         return a_pn, a_kc, a_en
+
+    def _adapt(self,pn):
+        timesteps = 10
+        print("adapting")
+        #self.lambdas = np.full(self.nb_kc, 500)
+        #print(pn)
+        #self.n_hist = self.n_hist / (np.exp(-(50-self.lambdas[0]))+1)
+        #self.n_hist = self.n_hist / 20
+        #print(np.exp(-(50-self.lambdas[0]))+1)
+        #print(self.n_hist)
+        for i in range(timesteps):
+            #Differences between each weight set and the input perception
+            diffs = np.vstack(pn) - self.w_pn2kc
+            dists = np.linalg.norm(diffs,axis=0)
+            print(np.min(dists))
+            print(np.max(dists))
+            w_w_fn = np.vectorize(lambda d, lamb: np.exp( -(d ** 2) / (lamb+15)))
+
+            pt = w_w_fn(dists,self.lambdas)
+            #print(np.max(pt))
+            #print(np.min(pt))
+            #print((pt>0.15).sum())
+            #print(pt)
+            pt = pt / pt.sum()
+            #print(pt)
+
+            self.n_hist = self.n_hist + 1.0*pt
+            g = 1/self.n_hist
+
+            delta_weights = 0.7*pt*g
+            #print(delta_weights)
+            delta = delta_weights * diffs
+            self.w_pn2kc = self.w_pn2kc + delta
+            self.w_pn2kc = 42 * self.w_pn2kc / np.linalg.norm(self.w_pn2kc,axis=0)
+            #print(self.w_pn2kc)
+
+            self.lambdas = self.lambdas / 1.05
+            mindist_index = np.argmin(dists)
+            #self.lambdas[mindist_index] = self.lambdas[mindist_index] / 1.1
+            #print(mindist_index)
 
     def _update(self, kc):
         """
@@ -97,6 +156,43 @@ class WillshawNet(Network):
         """
         learning_rule = (kc >= self.w_kc2en[:, 0]).astype(bool)
         self.w_kc2en[:, 0][learning_rule] = np.maximum(self.w_kc2en[:, 0][learning_rule] - self.learning_rate, 0)
+
+    def mask_pn2kc_weights_randomly(self):
+        mask = np.zeros((self.nb_pn,self.nb_kc))
+        for i in range(self.nb_kc):
+            nr_dims = random.randrange(8,13)
+            kept_dims = np.random.choice(self.nb_pn,nr_dims)
+            mask[kept_dims,i] = 1
+        self.w_pn2kc = self.w_pn2kc * mask
+
+    def mask_pn2kc_weights_pca(self):
+        mask = np.zeros((self.nb_pn,self.nb_kc))
+        pn_as_dims = np.transpose(self.w_pn2kc)
+
+        pca_instance = sklearn.decomposition.PCA(n_components=13)
+        pca_instance.fit(pn_as_dims)
+
+        dimprobs_unnorm = abs(np.matmul( pca_instance.explained_variance_, pca_instance.components_))
+        dimprobs =  dimprobs_unnorm / dimprobs_unnorm.sum()
+
+        for i in range(self.nb_kc):
+            nr_dims = random.randrange(8,13)
+            kept_dims = np.random.choice(self.nb_pn,nr_dims,p=dimprobs)
+            mask[kept_dims,i] = 1
+        self.w_pn2kc = self.w_pn2kc * mask
+
+
+
+def generate_random_pn2kc_weights(nb_pn, nb_kc, dtype = np.float32):
+
+    """
+    Generate a random initial set of weights producing a fully-connected PN-KC network,
+    with values in the interval [0,1), to be later modified during training.
+
+    """
+    w_pn2kc = np.random.rand(nb_pn,nb_kc).astype(dtype)
+    normal_w_pn2kc = 42* w_pn2kc / np.linalg.norm(w_pn2kc,axis=0)
+    return normal_w_pn2kc
 
 
 def generate_pn2kc_weights(nb_pn, nb_kc, min_pn=8, max_pn=12, aff_pn2kc=None, nb_trials=100000, baseline=25000,
