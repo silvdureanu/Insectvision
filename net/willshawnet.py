@@ -6,6 +6,9 @@ from net.base import Network, RNG
 
 import numpy as np
 import sklearn.decomposition
+from sklearn.neighbors import KernelDensity
+from sklearn.decomposition import PCA
+from sklearn.model_selection import GridSearchCV
 import yaml
 import os
 import random
@@ -38,6 +41,7 @@ class WillshawNet(Network):
         self.learning_rate = learning_rate
         self._tau = tau
         self.nb_channels = nb_channels
+        np.random.seed(2019)
 
         self.nb_pn = params['mushroom-body']['PN'] * nb_channels
         self.nb_kc = params['mushroom-body']['KC'] * nb_channels
@@ -50,12 +54,14 @@ class WillshawNet(Network):
         self.n_hist = np.zeros(self.nb_kc)
         self.lambdas = np.full(self.nb_kc, 600)
         self.density_mask = np.ones(self.nb_kc, dtype=self.dtype)
+        self.recorded_pns = np.array([])
 
         self.f_pn = lambda x: np.maximum(self.dtype(x) / self.dtype(255), 0)
         # self.f_pn = lambda x: np.maximum(self.dtype(self.dtype(x) / self.dtype(255) > .5), 0)
         self.f_kc = lambda x: self.dtype(x > tau)
         self.f_kc_dynamic = lambda x: self.dtype(x > 0)
         self.f_en = lambda x: np.maximum(x, 0)
+        self.act_kc = np.array([])
 
         self.pn = np.zeros(self.nb_pn)
         self.kc = np.zeros(self.nb_kc)
@@ -87,14 +93,20 @@ class WillshawNet(Network):
         a_pn = self.f_pn(pn)
         #Normalise the input
         a_pn = 42 * a_pn / np.linalg.norm(a_pn)
+        '''if (len(self.recorded_pns) == 0):
+            self.recorded_pns = a_pn
+        else:
+            self.recorded_pns = np.stack(self.recorded_pns,a_pn)'''
         kc = a_pn.dot(self.w_pn2kc)
         #Scale KC activations by the local density, ensuring that KCs in areas with higher densities are proportionally
         #   harder to activate, meaning that the % of activated KCs should remain constant
-        kc = kc / self.density_mask
+        #kc = kc / self.density_mask
         a_kc = self.f_kc(kc)
-        #biased_kc = kc - (self._tau * 250*self.n_hist)
-        #a_kc = self.f_kc_dynamic(biased_kc)
+        biased_kc = kc - (self._tau * 50*self.n_hist)
+        a_kc = self.f_kc_dynamic(biased_kc)
         print(np.count_nonzero(a_kc)/self.nb_kc)
+        if not self.adapt and not self.update:
+            print(np.nonzero(a_kc))
         en = a_kc.dot(self.w_kc2en)
         a_en = self.f_en(en)
         return a_pn, a_kc, a_en
@@ -108,13 +120,14 @@ class WillshawNet(Network):
         #self.n_hist = self.n_hist / 20
         #print(np.exp(-(50-self.lambdas[0]))+1)
         #print(self.n_hist)
+        w_w_fn = np.vectorize(lambda d, lamb: np.exp( -(d ** 2) / (lamb+15)))
         for i in range(timesteps):
             #Differences between each weight set and the input perception
             diffs = np.vstack(pn) - self.w_pn2kc
             dists = np.linalg.norm(diffs,axis=0)
             print(np.min(dists))
             print(np.max(dists))
-            w_w_fn = np.vectorize(lambda d, lamb: np.exp( -(d ** 2) / (lamb+15)))
+
 
             pt = w_w_fn(dists,self.lambdas)
             #print(np.max(pt))
@@ -133,11 +146,13 @@ class WillshawNet(Network):
             self.w_pn2kc = self.w_pn2kc + delta
             self.w_pn2kc = 42 * self.w_pn2kc / np.linalg.norm(self.w_pn2kc,axis=0)
             #print(self.w_pn2kc)
-
             self.lambdas = self.lambdas / 1.05
             mindist_index = np.argmin(dists)
             #self.lambdas[mindist_index] = self.lambdas[mindist_index] / 1.1
             #print(mindist_index)
+        print("HIST")
+        print(np.min(self.n_hist))
+        print(np.max(self.n_hist))
 
     def _update(self, kc):
         """
@@ -181,8 +196,6 @@ class WillshawNet(Network):
             mask[kept_dims,i] = 1
         self.w_pn2kc = self.w_pn2kc * mask
 
-
-
 def generate_random_pn2kc_weights(nb_pn, nb_kc, dtype = np.float32):
 
     """
@@ -190,6 +203,7 @@ def generate_random_pn2kc_weights(nb_pn, nb_kc, dtype = np.float32):
     with values in the interval [0,1), to be later modified during training.
 
     """
+    np.random.seed(2019)
     w_pn2kc = np.random.rand(nb_pn,nb_kc).astype(dtype)
     normal_w_pn2kc = 42* w_pn2kc / np.linalg.norm(w_pn2kc,axis=0)
     return normal_w_pn2kc
