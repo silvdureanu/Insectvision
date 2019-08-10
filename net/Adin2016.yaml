@@ -1,6 +1,6 @@
 gain: -20.
 learning-rate: .2
-kc-threshold: 370
+kc-threshold: 1150
 mushroom-body:
   PN: 360
   KC: 20000

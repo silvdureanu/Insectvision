@@ -102,7 +102,7 @@ class WillshawNet(Network):
         #   harder to activate, meaning that the % of activated KCs should remain constant
         #kc = kc / self.density_mask
         a_kc = self.f_kc(kc)
-        biased_kc = kc - (self._tau * 50*self.n_hist)
+        biased_kc = 10*kc - (self._tau * self.density_mask)
         a_kc = self.f_kc_dynamic(biased_kc)
         print(np.count_nonzero(a_kc)/self.nb_kc)
         if not self.adapt and not self.update:
@@ -146,10 +146,21 @@ class WillshawNet(Network):
             self.w_pn2kc = self.w_pn2kc + delta
             self.w_pn2kc = 42 * self.w_pn2kc / np.linalg.norm(self.w_pn2kc,axis=0)
             #print(self.w_pn2kc)
-            self.lambdas = self.lambdas / 1.05
+            if self.lambdas[0]>25:
+                self.lambdas = self.lambdas / 1.05
+            else:
+                self.lambdas = self.lambdas / 1.01
             mindist_index = np.argmin(dists)
             #self.lambdas[mindist_index] = self.lambdas[mindist_index] / 1.1
             #print(mindist_index)
+        nr_winners = np.count_nonzero(pt>(1/self.nb_kc))
+        print(nr_winners)
+        print("LAMBDA")
+        print(self.lambdas[0])
+        if self.lambdas[0]<15:
+            self.density_mask[pt>(1/self.nb_kc)] = self.density_mask[pt>(1/self.nb_kc)] / 16
+            self.density_mask[pt>(1/self.nb_kc)] = self.density_mask[pt>(1/self.nb_kc)] + nr_winners
+            print(self.density_mask)
         print("HIST")
         print(np.min(self.n_hist))
         print(np.max(self.n_hist))
