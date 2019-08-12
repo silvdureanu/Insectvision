@@ -3,8 +3,10 @@ from PIL import Image
 sys.path.insert(0, '../../compmodels')
 sys.path.insert(0, '..')
 from net.base import Network, RNG
+from net.sparse_autoencoder import SparseAutoencoder
 
 import numpy as np
+import torch
 import sklearn.decomposition
 from sklearn.neighbors import KernelDensity
 from sklearn.decomposition import PCA
@@ -90,14 +92,14 @@ class WillshawNet(Network):
         return self.en
 
     def _fprop(self, pn):
-        a_pn = self.f_pn(pn)
+        #a_pn = self.f_pn(pn)
         #Normalise the input
-        a_pn = 42 * a_pn / np.linalg.norm(a_pn)
+        #a_pn = 42 * a_pn / np.linalg.norm(a_pn)
         '''if (len(self.recorded_pns) == 0):
             self.recorded_pns = a_pn
         else:
             self.recorded_pns = np.stack(self.recorded_pns,a_pn)'''
-        kc = a_pn.dot(self.w_pn2kc)
+        '''kc = pn.dot(self.w_pn2kc)
         #Scale KC activations by the local density, ensuring that KCs in areas with higher densities are proportionally
         #   harder to activate, meaning that the % of activated KCs should remain constant
         #kc = kc / self.density_mask
@@ -107,9 +109,26 @@ class WillshawNet(Network):
         print(np.count_nonzero(a_kc)/self.nb_kc)
         if not self.adapt and not self.update:
             print(np.nonzero(a_kc))
-        en = a_kc.dot(self.w_kc2en)
+        en = a_kc.dot(self.w_kc2en)'''
+        #pn = self.f_pn(pn)
+        i_pn = pn
+        device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+        ae = (SparseAutoencoder()).to(device)
+        ae.eval()
+        ae.load_state_dict(torch.load('../../insectvision/net/ae.params'))
+        ae.eval()
+        pn = torch.from_numpy(pn).float().to(device)
+        kc, y_pred = ae(pn)
+        kc = kc.cpu().detach().numpy()
+        #y_pred  = y_pred.cpu().detach().numpy()
+        #print(y_pred)
+        a_kc = self.f_kc(kc)
+        print(np.nonzero(a_kc))
+        #print(((kc > 0.01).sum())/self.nb_kc)
+        #print(kc>0.01)
+        en = kc.dot(self.w_kc2en)
         a_en = self.f_en(en)
-        return a_pn, a_kc, a_en
+        return i_pn, kc, a_en
 
     def _adapt(self,pn):
         timesteps = 10
